@@ -6,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Thread } from 'src/threads/thread.entity';
-import { User } from 'src/users/user.entity';
+import { Thread } from '../threads/thread.entity';
+import { User } from '../users/user.entity';
 
 @Entity('comments')
 export class Comment {
@@ -30,7 +30,7 @@ export class Comment {
   @Column({ type: 'varchar' })
   authorId: string | undefined;
 
-  @ManyToOne(() => User, (user) => user.threads, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'authorId' })
   author: User | undefined;
 }

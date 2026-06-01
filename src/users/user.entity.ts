@@ -1,6 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Thread } from '../threads/thread.entity';
-import { Comment } from '../comments/comment.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -15,10 +13,4 @@ export class User {
 
   @Column({ type: 'varchar' })
   password: string | undefined;
-
-  @OneToMany(() => Thread, (thread) => thread.author)
-  threads: Thread[] | undefined;
-
-  @OneToMany(() => Comment, (comment) => comment.author)
-  comments: Comment[] | undefined;
 }
