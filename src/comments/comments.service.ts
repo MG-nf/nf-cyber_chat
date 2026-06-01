@@ -1,39 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CommentsRepository } from './comments.repository';
-import { Comment } from './comment.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Comment } from './comment.entity.js';
+import { Thread } from '../threads/thread.entity.js';
+import { CreateCommentDto } from './dto/create-comment.dto.js';
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    @InjectRepository(Comment)
+    private readonly commentsRepository: Repository<Comment>,
+    @InjectRepository(Thread)
+    private readonly threadsRepository: Repository<Thread>,
+  ) {}
 
-  async createComment(
-    threadId: string,
-    authorId: string,
-    body: string,
-  ): Promise<Comment> {
-    const comment = this.commentsRepository.create({
-      threadId,
-      authorId,
-      body,
+  async create(threadId: string, dto: CreateCommentDto): Promise<Comment> {
+    const thread = await this.threadsRepository.findOne({
+      where: { id: threadId },
     });
-    return this.commentsRepository.save(comment);
-  }
-
-  async findOne(id: string): Promise<Comment> {
-    const comment = await this.commentsRepository.findOne({ where: { id } });
-    if (!comment) {
-      throw new NotFoundException(`Comment with ID ${id} not found`);
+    if (!thread) {
+      throw new NotFoundException(`Thread with ID "${threadId}" not found`);
     }
-    return comment;
-  }
 
-  async softDeleteComment(id: string): Promise<Comment> {
-    const comment = await this.findOne(id);
-    comment.body = 'deleted';
-    return this.commentsRepository.save(comment);
-  }
+    const comment = this.commentsRepository.create({
+      body: dto.body,
+      author: { id: dto.author },
+      thread: thread,
+    });
 
-  async deleteCommentsByThread(threadId: string): Promise<void> {
-    await this.commentsRepository.delete({ threadId });
+    return await this.commentsRepository.save(comment);
   }
 }

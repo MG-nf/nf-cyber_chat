@@ -1,17 +1,17 @@
-import { Controller, Get, Delete, Param } from '@nestjs/common';
-import { CommentsService } from './comments.service';
+import { Controller, Post, Body, Param } from '@nestjs/common';
+import { CommentsService } from './comments.service.js';
+import { CreateCommentDto } from './dto/create-comment.dto.js';
+import { Comment } from './comment.entity.js';
 
-@Controller('comments')
+@Controller('threads')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(id);
-  }
-
-  @Delete(':id')
-  softDelete(@Param('id') id: string) {
-    return this.commentsService.softDeleteComment(id);
+  @Post(':id/comments')
+  create(
+    @Param('id') threadId: string,
+    @Body() createCommentDto: CreateCommentDto,
+  ): Promise<Comment> {
+    return this.commentsService.create(threadId, createCommentDto);
   }
 }

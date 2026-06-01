@@ -1,35 +1,33 @@
-import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
-import { ThreadsService } from './threads.service';
+import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
+import { ThreadsService } from './threads.service.js';
+import { CreateThreadDto } from './dto/create-thread.dto.js';
+import { UpdateThreadDto } from './dto/update-thread.dto.js';
+import { Thread } from './thread.entity.js';
 
 @Controller('threads')
 export class ThreadsController {
   constructor(private readonly threadsService: ThreadsService) {}
 
   @Post()
-  create(@Body() body: { title: string; author: string; body: string }) {
-    return this.threadsService.createThread(body.title, body.author, body.body);
+  create(@Body() createThreadDto: CreateThreadDto): Promise<Thread> {
+    return this.threadsService.create(createThreadDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Thread[]> {
     return this.threadsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<Thread> {
     return this.threadsService.findOne(id);
   }
 
-  @Post(':id/comments')
-  addComment(
+  @Patch(':id')
+  update(
     @Param('id') id: string,
-    @Body() body: { author: string; body: string },
-  ) {
-    return this.threadsService.addComment(id, body.author, body.body);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.threadsService.removeThread(id);
+    @Body() updateThreadDto: UpdateThreadDto,
+  ): Promise<Thread> {
+    return this.threadsService.update(id, updateThreadDto);
   }
 }

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ThreadsService } from './threads.service';
-import { ThreadsController } from './threads.controller';
-import { ThreadsRepository } from './threads.repository';
-import { CommentsModule } from '../comments/comments.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThreadsController } from './threads.controller.js';
+import { ThreadsService } from './threads.service.js';
+import { Thread } from './thread.entity.js';
 
 @Module({
-  imports: [CommentsModule], // Import CommentsModule to inject its service
-  providers: [ThreadsService, ThreadsRepository],
+  imports: [TypeOrmModule.forFeature([Thread])],
   controllers: [ThreadsController],
+  providers: [ThreadsService],
 })
 export class ThreadsModule {}
